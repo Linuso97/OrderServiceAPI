@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderServiceAPI.Data;
 using OrderServiceAPI.Models.Products;
+using OrderServiceAPI.Services;
 
 namespace OrderServiceAPI.Controllers
 {
@@ -14,25 +15,26 @@ namespace OrderServiceAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly OrderServiceDbContext _context;
+        private readonly IProductsService _prodService;
 
-        public ProductsController(OrderServiceDbContext context)
+        public ProductsController(IProductsService productsService)
         {
-            _context = context;
+            _prodService = productsService;
         }
 
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            var products = await _prodService.GetAllProductsAsync();
+            return Ok(products);
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<Product?>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _prodService.GetProductByIdAsync(id);
 
             if (product == null)
             {
@@ -45,22 +47,20 @@ namespace OrderServiceAPI.Controllers
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        public async Task<IActionResult> PutProduct(Product product, int id)
         {
             if (id != product.ProductId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(product).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _prodService.UpdateProductAsync(product, id);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductExists(id))
+                if (!await _prodService.ProductExistsAsync(id))
                 {
                     return NotFound();
                 }
@@ -78,9 +78,7 @@ namespace OrderServiceAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
+            await _prodService.AddProductAsync(product);
             return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
         }
 
@@ -88,21 +86,15 @@ namespace OrderServiceAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            await _prodService.DeleteProductAsync(id);
+
+            var product = await _prodService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.ProductId == id);
         }
     }
 }
