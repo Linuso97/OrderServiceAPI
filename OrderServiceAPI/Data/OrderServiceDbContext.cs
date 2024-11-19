@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OrderServiceAPI.Models.Customers;
+using OrderServiceAPI.Models.Orders;
+using OrderServiceAPI.Models.Products;
 
 namespace OrderServiceAPI.Data
 {
@@ -9,5 +12,9 @@ namespace OrderServiceAPI.Data
             
         }
 
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
     }
 }
