@@ -26,7 +26,7 @@ namespace OrderServiceAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            var products = await _prodService.GetAllProductsAsync();
+            var products = await _prodService.GetProductsAsync();
             return Ok(products);
         }
 
@@ -45,7 +45,6 @@ namespace OrderServiceAPI.Controllers
         }
 
         // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(Product product, int id)
         {
@@ -74,7 +73,6 @@ namespace OrderServiceAPI.Controllers
         }
 
         // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {

@@ -14,7 +14,7 @@ namespace OrderServiceAPI.Services
             _context = context;
         }
 
-        public async Task<ActionResult<IEnumerable<Product>>> GetAllProductsAsync()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsAsync()
         {
             return await _context.Products.ToListAsync();
         }
@@ -30,10 +30,11 @@ namespace OrderServiceAPI.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddProductAsync(Product product)
+        public async Task<Product> AddProductAsync(Product product)
         {
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
+            return product;
         }
 
         public async Task DeleteProductAsync(int id)

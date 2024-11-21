@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderServiceAPI.Data;
 using OrderServiceAPI.Models.Customers;
+using OrderServiceAPI.Services;
 
 namespace OrderServiceAPI.Controllers
 {
@@ -14,25 +15,25 @@ namespace OrderServiceAPI.Controllers
     [ApiController]
     public class CustomersController : ControllerBase
     {
-        private readonly OrderServiceDbContext _context;
+        private readonly ICustomerService _customerService;
 
-        public CustomersController(OrderServiceDbContext context)
+        public CustomersController(ICustomerService customerService)
         {
-            _context = context;
+            _customerService = customerService;
         }
 
         // GET: api/Customers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-            return await _context.Customers.ToListAsync();
+            return await _customerService.GetCustomersAsync();
         }
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _customerService.GetCustomerByIdAsync(id);
 
             if (customer == null)
             {
@@ -43,7 +44,6 @@ namespace OrderServiceAPI.Controllers
         }
 
         // PUT: api/Customers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
@@ -52,15 +52,13 @@ namespace OrderServiceAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(customer).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _customerService.UpdateCustomerAsync(id, customer);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CustomerExists(id))
+                if (!await _customerService.CustomerExists(id))
                 {
                     return NotFound();
                 }
@@ -74,13 +72,10 @@ namespace OrderServiceAPI.Controllers
         }
 
         // POST: api/Customers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
-
+            await _customerService.AddCustomerAsync(customer);
             return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
         }
 
@@ -88,21 +83,15 @@ namespace OrderServiceAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            await _customerService.DeleteCustomerAsync(id);
+            var customer = await _customerService.GetCustomerByIdAsync(id);
+
             if (customer == null)
             {
                 return NotFound();
             }
 
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.CustomerId == id);
         }
     }
 }
