@@ -1,4 +1,5 @@
-﻿using OrderServiceAPI.Services;
+﻿using OrderServiceAPI.Services.Customers;
+using OrderServiceAPI.Services.Products;
 
 namespace OrderServiceAPI
 {

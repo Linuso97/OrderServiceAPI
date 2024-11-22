@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderServiceAPI.Models.Products;
 
-namespace OrderServiceAPI.Services
+namespace OrderServiceAPI.Services.Products
 {
     public interface IProductsService
     {

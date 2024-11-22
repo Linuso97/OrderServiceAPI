@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderServiceAPI.Data;
 using OrderServiceAPI.Models.Products;
-using OrderServiceAPI.Services;
+using OrderServiceAPI.Services.Products;
 
 namespace OrderServiceAPI.Controllers
 {

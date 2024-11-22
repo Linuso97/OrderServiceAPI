@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OrderServiceAPI.Data;
 using OrderServiceAPI.Models.Products;
 
-namespace OrderServiceAPI.Services
+namespace OrderServiceAPI.Services.Products
 {
     public class ProductsService : IProductsService
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OrderServiceAPI.Data;
 using OrderServiceAPI.Models.Customers;
 
-namespace OrderServiceAPI.Services
+namespace OrderServiceAPI.Services.Customers
 {
     public class CustomerService : ICustomerService
     {
