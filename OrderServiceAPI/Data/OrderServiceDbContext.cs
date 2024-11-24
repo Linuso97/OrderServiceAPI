@@ -16,5 +16,7 @@ namespace OrderServiceAPI.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<OrderRequest> OrderRequests { get; set; }
+        public DbSet<OrderRequestItem> OrderRequestItems { get; set; }
     }
 }

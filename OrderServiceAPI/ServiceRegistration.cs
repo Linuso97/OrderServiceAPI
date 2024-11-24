@@ -1,4 +1,5 @@
 ﻿using OrderServiceAPI.Services.Customers;
+using OrderServiceAPI.Services.Orders;
 using OrderServiceAPI.Services.Products;
 
 namespace OrderServiceAPI
@@ -9,7 +10,7 @@ namespace OrderServiceAPI
         {
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IProductsService, ProductsService>();
-            //services.AddScoped<IOrdersService, OrderService>();
+            services.AddScoped<IOrdersService, OrdersService>();
             return services;
         }
     }

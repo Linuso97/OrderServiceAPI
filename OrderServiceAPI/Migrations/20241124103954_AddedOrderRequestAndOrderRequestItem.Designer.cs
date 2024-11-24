@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderServiceAPI.Data;
 
@@ -11,9 +12,11 @@ using OrderServiceAPI.Data;
 namespace OrderServiceAPI.Migrations
 {
     [DbContext(typeof(OrderServiceDbContext))]
-    partial class OrderServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241124103954_AddedOrderRequestAndOrderRequestItem")]
+    partial class AddedOrderRequestAndOrderRequestItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,6 +117,8 @@ namespace OrderServiceAPI.Migrations
 
                     b.HasKey("OrderRequestId");
 
+                    b.HasIndex("CustomerId");
+
                     b.ToTable("OrderRequests");
                 });
 
@@ -137,6 +142,8 @@ namespace OrderServiceAPI.Migrations
                     b.HasKey("OrderRequestItemId");
 
                     b.HasIndex("OrderRequestId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("OrderRequestItems");
                 });
@@ -195,13 +202,34 @@ namespace OrderServiceAPI.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("OrderServiceAPI.Models.Orders.OrderRequest", b =>
+                {
+                    b.HasOne("OrderServiceAPI.Models.Customers.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("OrderServiceAPI.Models.Orders.OrderRequestItem", b =>
                 {
-                    b.HasOne("OrderServiceAPI.Models.Orders.OrderRequest", null)
+                    b.HasOne("OrderServiceAPI.Models.Orders.OrderRequest", "OrderRequest")
                         .WithMany("Items")
                         .HasForeignKey("OrderRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("OrderServiceAPI.Models.Products.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderRequest");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("OrderServiceAPI.Models.Orders.OrderRequest", b =>

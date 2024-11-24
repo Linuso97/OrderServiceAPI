@@ -3,7 +3,7 @@ using OrderServiceAPI.Models.Orders;
 
 namespace OrderServiceAPI.Services.Orders
 {
-    public class OrdersService
+    public class OrdersService : IOrdersService
     {
         readonly OrderServiceDbContext _context;
         public OrdersService(OrderServiceDbContext context)
@@ -11,11 +11,11 @@ namespace OrderServiceAPI.Services.Orders
             _context = context;
         }
 
-        public async Task<Order> CreateOrderAsync(Order order, List<OrderItem> orderItems)
+        public async Task<Order> CreateOrderAsync(OrderRequest orderRequest)
         {
             var newOrder = new Order
             {
-                CustomerId = order.CustomerId,
+                CustomerId = orderRequest.CustomerId,
                 OrderDate = DateTime.UtcNow,
                 TotalAmount = 0
             };
@@ -25,11 +25,11 @@ namespace OrderServiceAPI.Services.Orders
 
             decimal totalAmount = 0;
 
-            foreach (var item in orderItems)
+            foreach (var item in orderRequest.Items)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
 
-                if(product == null)
+                if (product == null)
                 {
                     throw new Exception($"Product with ID {item.ProductId} not found.");
                 }
@@ -43,12 +43,12 @@ namespace OrderServiceAPI.Services.Orders
                 };
                 await _context.AddAsync(orderItem);
 
-                totalAmount += item.Quantity * item.UnitPrice;                
+                totalAmount += item.Quantity * product.Price;
             }
 
             newOrder.TotalAmount = totalAmount;
             await _context.SaveChangesAsync();
             return newOrder;
         }
-}
+    }
 }
