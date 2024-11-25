@@ -1,4 +1,6 @@
-﻿using OrderServiceAPI.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OrderServiceAPI.Data;
 using OrderServiceAPI.Models.Orders;
 
 namespace OrderServiceAPI.Services.Orders
@@ -13,6 +15,8 @@ namespace OrderServiceAPI.Services.Orders
 
         public async Task<Order> CreateOrderAsync(OrderRequest orderRequest)
         {
+            await CustomerExistsAsync(orderRequest);
+
             var newOrder = new Order
             {
                 CustomerId = orderRequest.CustomerId,
@@ -49,6 +53,35 @@ namespace OrderServiceAPI.Services.Orders
             newOrder.TotalAmount = totalAmount;
             await _context.SaveChangesAsync();
             return newOrder;
+        }
+
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersAsync()
+        {
+            return await _context.Orders.ToListAsync();
+        }
+
+        public async Task<ActionResult<Order?>> GetOrderByIdAsync(int id)
+        {
+            return await _context.Orders.FindAsync(id);
+        }
+
+        public async Task DeleteOrderAsync(int id)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(q => q.OrderId == id);
+            if (order != null)
+            {
+                _context.Orders.Remove(order);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task CustomerExistsAsync(OrderRequest orderRequest)
+        {
+            var customerExists = await _context.Customers.AnyAsync(q => q.CustomerId == orderRequest.CustomerId);
+            if (!customerExists)
+            {
+                throw new Exception($"Customer with ID {orderRequest.CustomerId} not found.");
+            }
         }
     }
 }
